@@ -2,6 +2,7 @@
 import numpy as np
 from typing import List, Dict, Tuple, Union
 from numpy.typing import ArrayLike
+from sklearn.model_selection import train_test_split
 
 class NeuralNetwork:
     """
@@ -118,7 +119,7 @@ class NeuralNetwork:
         #apply activation function    
         if activation == 'sigmoid':
             A_curr=self._sigmoid(Z_curr)      
-        if activation =='relu':
+        elif activation =='relu':
             A_curr=self._relu(Z_curr)
         else:
             raise Exception('no suitable activation function chosen!!!!!!!1!!!!')
@@ -360,7 +361,7 @@ class NeuralNetwork:
         for epoch in range(self._epochs):
            
             
-            if epoch % 50==0:
+            if epoch % 100==0:
                  print('epoch: ', epoch)
             
             
@@ -392,33 +393,35 @@ class NeuralNetwork:
             batch_loss_train=[]
             
             # Iterate through batches (one of these loops is one epoch of training)
-            for X_train, y_train in zip(X_batch, y_batch):
+            for X_train_batch, y_train_batch in zip(X_batch, y_batch):
                 
                 #print('X_train shape', X_train.shape)
                 #print('y_train shape', y_train.shape)
+
+               
                 
                 
                 #forward pass
-                y_pred, cache = self.forward(X_train)
+                y_pred, cache = self.forward(X_train_batch)
                 #print('y_pred shape', y_pred.shape)
 
                 #calculate loss 
                 if self._loss_func =='mse':
-                    train_loss=self._mean_squared_error(y=y_train, y_hat=y_pred)
+                    train_loss=self._mean_squared_error(y=y_train_batch, y_hat=y_pred)
                 elif self._loss_func =='bce':
-                    train_loss=self._binary_cross_entropy(y=y_train, y_hat=y_pred)
+                    train_loss=self._binary_cross_entropy(y=y_train_batch, y_hat=y_pred)
                 else:
                     raise Exception('No availalbe loss function chosen')
                   
                 #add to batch loss list 
                 batch_loss_train.append(train_loss)
+                #print(train_loss)
                 
                 
                 #then, backpropagate 
-                grad_dict=self.backprop(y=y_train, y_hat=y_pred, cache=cache)
-                
-
-                    
+                grad_dict=self.backprop(y=y_train_batch, y_hat=y_pred, cache=cache)
+                #print(grad_dict['W1'])
+                #print(grad_dict['W2'])
                     
                 #update parameter weights 
                 self._update_params(grad_dict)

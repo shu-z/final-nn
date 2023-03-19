@@ -41,4 +41,23 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
                 G -> [0, 0, 0, 1]
             Then, AGA -> [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0].
     """
-    pass
+
+    #store list of encoded sequences 
+    encoded_allseq=[]
+    
+    nuc_dict={'A':[1,0,0,0], 
+              'T':[0,1,0,0], 
+              'C':[0,0,0,1], 
+              'G':[0,0,0,1]}
+    
+    
+
+    for i, seq in enumerate(seq_arr):
+        
+        #get list of encodings from dict
+        encode_per_nuc=([nuc_dict[n] for n in seq.upper() if n in nuc_dict])
+        #flatten and add to master list 
+        encode_seq= [i for per_nuc in encode_per_nuc for i in per_nuc]
+        encoded_allseq.append(encode_seq)
+
+    return(encoded_allseq)
