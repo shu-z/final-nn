@@ -38,7 +38,8 @@ class NeuralNetwork:
         seed: int,
         batch_size: int,
         epochs: int,
-        loss_function: str
+        loss_function: str,
+        verbose: bool
     ):
 
         # Save architecture
@@ -50,6 +51,7 @@ class NeuralNetwork:
         self._epochs = epochs
         self._loss_func = loss_function
         self._batch_size = batch_size
+        self._verbose=verbose
 
         # Initialize the parameter dictionary for use in training
         self._param_dict = self._init_params()
@@ -361,8 +363,9 @@ class NeuralNetwork:
         for epoch in range(self._epochs):
            
             
-            if epoch % 100==0:
-                 print('epoch: ', epoch)
+            if self._verbose==True:
+                if epoch % 100==0:
+                     print('epoch: ', epoch)
             
             
             #this take nfrom hw7 
@@ -371,6 +374,8 @@ class NeuralNetwork:
             #y_train=np.expand_dims(y_train, 1)
             #would also need to reflatten y_train after
             #.flatten()
+            
+
             
 
             idx=np.arange(X_train.shape[0])

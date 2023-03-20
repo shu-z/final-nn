@@ -16,13 +16,23 @@ example_nn = NeuralNetwork(nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activ
                             lr = 0.0005, seed = 3, batch_size = 100, epochs = 500, loss_function='mse')
 
 
-#make lame test dataset to use 
+#use digits as a test dataset 
 
 
 def test_single_forward():
+
+    #check that A_curr and Z_cur values are expected as to when calculated by hand
+    
+
+    #check dimensions of A_curr and Z_curr
+
+ 
     pass
 
 def test_forward():
+
+
+    #check that 
     pass
 
 def test_single_backprop():
