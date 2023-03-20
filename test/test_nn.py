@@ -57,8 +57,11 @@ def test_binary_cross_entropy_backprop():
 def test_mean_squared_error():
 
     #make random y_true and y_pred
-    y_true=[0, 1, 1, 0, 1, 1, 0]
-    y_pred=[0.1, 0.9, 0.7, 0.2, 0.5, 0.6, 0.3]
+    y_true=[0, 1, 1, 0.75, 0.25]
+    y_pred=[0.1, 0.9, 0.7, 0.2]
+
+
+    #compare to hand calculated 
 
 
     pass

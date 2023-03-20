@@ -225,8 +225,10 @@ class NeuralNetwork:
             
         #check this   
         m=A_prev.shape[1]
-        dW_curr=np.dot(dZ.T, A_prev) / m 
-        db_curr=np.sum(dZ, axis=0) / m 
+        #dW_curr=np.dot(dZ.T, A_prev) / m 
+        #db_curr=np.sum(dZ, axis=0) / m 
+        dW_curr=np.dot(dZ.T, A_prev)  
+        db_curr=np.sum(dZ, axis=0) 
         #dA_prev=np.dot(W_curr.T, dZ.T)
         dA_prev=(dZ, W_curr)
         
@@ -321,10 +323,8 @@ class NeuralNetwork:
             #update based on learning rate and gradient for that node 
             self._param_dict['W'+str(l)] -= self._lr * grad_dict['W'+str(l)]
             self._param_dict['b'+str(l)] -= self._lr * np.expand_dims(grad_dict['b'+str(l)], 1)
-            
-            
-            
-            #i think just these two?
+
+           
 
     def fit(
         self,
