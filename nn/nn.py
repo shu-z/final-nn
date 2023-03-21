@@ -54,7 +54,7 @@ class NeuralNetwork:
 
         # Initialize the parameter dictionary for use in training
         self._param_dict = self._init_params()
-        self._param_dict_init=self._param_dict
+        self.batch_count=0
 
     def _init_params(self) -> Dict[str, ArrayLike]:
         """
@@ -372,6 +372,7 @@ class NeuralNetwork:
             
             # Iterate through batches (one of these loops is one epoch of training)
             for X_train_batch, y_train_batch in zip(X_batch, y_batch):
+                self.batch_count+=1
                 
                 #print('X_train shape', X_train.shape)
                 #print('y_train shape', y_train.shape)
@@ -442,8 +443,8 @@ class NeuralNetwork:
                 Prediction from the model.
         """
 
-        if self._param_dict_init==self._param_dict:
-            raise Warning('Param dict is same as initial param dict. Make sure fit was run')
+        if self.batch_count==0:
+            raise Warning('Batch count is 0. Make sure fit was run')
         
         y_hat,_ =self.forward(X)
         return y_hat

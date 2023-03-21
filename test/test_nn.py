@@ -129,20 +129,20 @@ def test_predict():
         output_dim = layer['output_dim']
         param_dict['W' + str(layer_idx)] = np.random.randn(output_dim, input_dim) * 0.1
         param_dict['b' + str(layer_idx)] = np.random.randn(output_dim, 1) * 0.1
+    
     simple_nn._param_dict=param_dict
-    #set initial param dict, which throws error if predict is run and params don't change
-    simple_nn._param_dict_init=param_dict
-
 
     #make toy X 
     X=np.array([[1,2,5], [1,1,1]])
 
     #check that warning is thrown if fit isn't run before predict
+    #model knows if batch_count is 0
+    simple_nn.batch_count=0
     with pytest.raises(Warning):
         simple_nn.predict(X)
     
-    #now just set init params to empty dict
-    simple_nn._param_dict_init={}
+    #now just set batch count to higher than 1
+    simple_nn.batch_count=1
 
     #check that predicted values are as expected 
     y_pred = simple_nn.predict(X)

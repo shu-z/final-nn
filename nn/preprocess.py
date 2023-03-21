@@ -39,8 +39,8 @@ def sample_seqs(seqs: List[str], labels: List[bool]) -> Tuple[List[str], List[bo
         
         #sample more of label_names[1] 
         sampled_label1=random.choices(label1, k=label_counts[0])
-        #sampled_label1=random.choices(range(0, len(label1)), k=label_counts[0])
 
+        #combine 
         sampled_seqs=label0 + sampled_label1
         sampled_labels=([label_names[0]] * label_counts[0]) + ([label_names[1]]* label_counts[0])
         
@@ -49,11 +49,11 @@ def sample_seqs(seqs: List[str], labels: List[bool]) -> Tuple[List[str], List[bo
         
     
     elif label_counts[0]<label_counts[1]:
-        #sample more of label_names[0]
-        
-        sampled_label0=random.choices(label0, k=label_counts[1])
-        #sampled_label1=random.choices(range(0, len(label1)), k=label_counts[0])
 
+        #sample more of label_names[0]
+        sampled_label0=random.choices(label0, k=label_counts[1])
+
+        #combine
         sampled_seqs=sampled_label0 + label1
         sampled_labels=([label_names[0]] * label_counts[1]) + ([label_names[1]] * label_counts[1])
 
@@ -92,14 +92,13 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
               'C':[0,1,0,0], 
               'G':[0,0,1,0], 
               'T':[0,0,0,1]}
-    
-    
-    
+ 
         
     for i, seq in enumerate(seq_arr):
 
         assert (all(n in nuc_dict for n in seq))
-    
+
+        #map each nuc in sequence based on dict
         encode_per_nuc=([nuc_dict[n] for n in seq.upper() if n in nuc_dict])
         encoded_allseq.append(np.concatenate(encode_per_nuc))
 
