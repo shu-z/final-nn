@@ -32,8 +32,7 @@ class NeuralNetwork:
     def __init__(
         self,
         #this throwing error fix later
-        #nn_arch: List[Dict[str, Union(int, str)]],
-        nn_arch: List,
+        nn_arch: List[Dict[str, Union[int, str]]],
         lr: float,
         seed: int,
         batch_size: int,
@@ -154,7 +153,7 @@ class NeuralNetwork:
         #add to cache
         cache['A0']=X
 
-        
+
         #loop through remaining number of layers in nn
         for l in range(1,len(self.arch)+1):
             #print('layer',  l)
@@ -230,7 +229,9 @@ class NeuralNetwork:
         #dW_curr=np.dot(dZ.T, A_prev) / m 
         #db_curr=np.sum(dZ, axis=0) / m 
         dW_curr=np.dot(dZ.T, A_prev)  
-        db_curr=np.sum(dZ, axis=0) 
+        db_curr=np.sum(dZ, axis=0).reshape(b_curr.shape)
+        #print('db_curr shape', db_curr.shape)
+        #print(db_curr)
         #dA_prev=np.dot(W_curr.T, dZ.T)
         dA_prev=np.dot(dZ, W_curr)
         
@@ -257,6 +258,14 @@ class NeuralNetwork:
         """
         grad_dict={}
 
+        #get dA i think from loss backprop
+        if self._loss_func =='mse':
+            dA_curr=self._mean_squared_error_backprop(y=y, y_hat=y_hat)
+        elif self._loss_func =='bce':
+            dA_curr=self._binary_cross_entropy_backprop(y=y, y_hat=y_hat)
+        else:
+            raise Exception('No availalbe loss function chosen')
+
         
         #go b a c k w a r d s 
         for l in range(len(self.arch), 0, -1):
@@ -272,13 +281,7 @@ class NeuralNetwork:
             activation_curr=self.arch[l-1]['activation']
             
             
-            #get dA i think from loss backprop
-            if self._loss_func =='mse':
-                dA_curr=self._mean_squared_error_backprop(y=y, y_hat=y_hat)
-            elif self._loss_func =='bce':
-                dA_curr=self._binary_cross_entropy_backprop(y=y, y_hat=y_hat)
-            else:
-                raise Exception('No availalbe loss function chosen')
+            
                  
             
             
@@ -297,7 +300,8 @@ class NeuralNetwork:
             #update grad_dict with gradients for W, b, A 
             grad_dict['W'+str(l)]=dW_curr
             grad_dict['b'+str(l)]=db_curr
-            grad_dict['A'+str(l-1)]=dA_prev
+
+            dA_curr=dA_prev
             
 
             
@@ -323,8 +327,14 @@ class NeuralNetwork:
             #idk if the indices are right 
             #update based on learning rate and gradient for that node 
             self._param_dict['W'+str(l)] -= self._lr * grad_dict['W'+str(l)]
-            self._param_dict['b'+str(l)] -= self._lr * np.expand_dims(grad_dict['b'+str(l)], 1)
+            #self._param_dict['b'+str(l)] -= self._lr * np.expand_dims(grad_dict['b'+str(l)], 1)
+            self._param_dict['W'+str(l)] -= self._lr * grad_dict['b'+str(l)]
 
+            #self._param_dict['W'+str(l)] = self._param_dict['W'+str(l)] - self._lr * grad_dict['W'+str(l)]
+            #self._param_dict['b'+str(l)] = self._param_dict['b'+str(l)] - self._lr * np.expand_dims(grad_dict['b'+str(l)], 1)
+
+
+            #self._param_dict['b'+str(l)] = self._param_dict['b'+str(l)] - self._lr * (grad_dict['b'+str(l)])
            
 
     def fit(
@@ -528,6 +538,7 @@ class NeuralNetwork:
         """
         return(np.maximum(0, Z))
 
+
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
         """
         ReLU derivative for backprop.
@@ -542,11 +553,9 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
-        relu_Z=self._relu(Z)
         
-        dZ=np.multiply(dA, relu_Z)
-        
-        return(dZ)
+        return ((Z > 0)*dA)
+    
 
     def _binary_cross_entropy(self, y: ArrayLike, y_hat: ArrayLike, error=1e-5) -> float:
         """
@@ -567,7 +576,7 @@ class NeuralNetwork:
         y_hat=np.float64(y_hat)
 
    
-        print(y_hat)
+        #print(y_hat)
 
          #add error so no divide by zero warning
         bce_loss= -np.mean(y*(np.log(y_hat + error)) +  (1-y)*np.log(1-y_hat + error)) 
@@ -639,5 +648,5 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
-        dA=np.mean(2*(y_hat-y))
+        dA=(2*(y_hat-y))/len(y)
         return(dA)
