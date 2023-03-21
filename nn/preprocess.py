@@ -21,10 +21,11 @@ def sample_seqs(seqs: List[str], labels: List[bool]) -> Tuple[List[str], List[bo
         sampled_labels: List[bool]
             List of labels for the sampled sequences
     """
+
+
     label_names, label_counts = np.unique(labels, return_counts=True)
-    #print(label_counts)
-    #print(label_names)
     
+    #assumes there are only two unique possible labels
     label0 = [seq for seq, label in zip(seqs, labels) if label==label_names[0]]
     label1 = [seq for seq, label in zip(seqs, labels) if label==label_names[1]]
         
@@ -88,14 +89,16 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
     encoded_allseq=[]
     
     nuc_dict={'A':[1,0,0,0], 
-              'T':[0,1,0,0], 
-              'C':[0,0,0,1], 
-              'G':[0,0,0,1]}
+              'C':[0,1,0,0], 
+              'G':[0,0,1,0], 
+              'T':[0,0,0,1]}
     
     
-
+    
         
     for i, seq in enumerate(seq_arr):
+
+        assert (all(n in nuc_dict for n in seq))
     
         encode_per_nuc=([nuc_dict[n] for n in seq.upper() if n in nuc_dict])
         encoded_allseq.append(np.concatenate(encode_per_nuc))

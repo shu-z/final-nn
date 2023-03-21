@@ -232,7 +232,7 @@ class NeuralNetwork:
         dW_curr=np.dot(dZ.T, A_prev)  
         db_curr=np.sum(dZ, axis=0) 
         #dA_prev=np.dot(W_curr.T, dZ.T)
-        dA_prev=(dZ, W_curr)
+        dA_prev=np.dot(dZ, W_curr)
         
         
         return(dA_prev, dW_curr, db_curr)
@@ -272,8 +272,7 @@ class NeuralNetwork:
             activation_curr=self.arch[l-1]['activation']
             
             
-            #get dA i think
-            #calculate loss 
+            #get dA i think from loss backprop
             if self._loss_func =='mse':
                 dA_curr=self._mean_squared_error_backprop(y=y, y_hat=y_hat)
             elif self._loss_func =='bce':
@@ -563,6 +562,13 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
+        #need to convert to floats
+        y=np.float64(y)
+        y_hat=np.float64(y_hat)
+
+   
+        print(y_hat)
+
          #add error so no divide by zero warning
         bce_loss= -np.mean(y*(np.log(y_hat + error)) +  (1-y)*np.log(1-y_hat + error)) 
         return(bce_loss)
@@ -582,13 +588,18 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
 
-        #idk man
+        #need to convert to floats
+        y=np.float64(y)
+        y_hat=np.float64(y_hat)
+
+
+        #first get bce 
         bce=self._binary_cross_entropy(y, y_hat)
         
         #i had to google this i'm sorry
         #add error for divide by zero 
         #need to double check this i think it's wrong 
-        dA=np.mean(-(y/y_hat + error) + (1-y)/(1-y_hat+error))
+        dA=-np.mean((y/y_hat + error) + (1-y)/(1-y_hat+error))
         #dA=np.mean((y/y_hat + error) + (1-y)/(1-y_hat+error))
 
         
@@ -610,6 +621,7 @@ class NeuralNetwork:
             loss: float
                 Average loss of mini-batch.
         """
+    
         mse = np.mean((y - y_hat) ** 2)
         return(mse)
 
