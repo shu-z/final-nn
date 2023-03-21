@@ -15,11 +15,10 @@ import matplotlib.pyplot as plt
 #make an instance of nn class to be used by multiple functions
 example_nn = NeuralNetwork(nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                                       {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}],
-                            lr = 0.0005, seed = 3, batch_size = 100, epochs = 500, loss_function='mse', verbose=False)
+                            lr = 0.0005, seed = 3, batch_size = 100, epochs = 100, loss_function='mse', verbose=False)
 
 
 #use digits as a test dataset
-# 
 digits = load_digits()
   
 #split into train and test sets 
@@ -113,7 +112,6 @@ def test_binary_cross_entropy_backprop():
     print(nn_backprop)
     assert np.isclose(nn_backprop, -1.120375, rtol=1e-4), 'BCE backpropagation value is not as expected'
 
-    pass
 
 def test_mean_squared_error():
 
@@ -134,29 +132,33 @@ def test_mean_squared_error():
 
 def test_mean_squared_error_backprop():
     #make random y_true and y_pred
-    y_true=[0, 0, 0]
-    y_pred=[1, 2, -3]
+    y_true=[0, 1, 4]
+    y_pred=[1, 2, 3]
 
 
     #compare to hand calculated 
     #nn_mse=example_nn._mean_squared_error(np.expand_dims(y_true, 1), np.expand_dims(y_pred,1))
     nn_mse=example_nn._mean_squared_error_backprop(np.array(y_true), np.array(y_pred))
+    print(nn_mse)
 
 	#check that mse  from our function is close to sklearn mse with reasonable tolerance 
-    assert np.isclose(nn_mse, 3, rtol=1e-4), 'MSE backpropagation value is not as expected'
+    assert np.isclose(nn_mse, 2/3, rtol=1e-4), 'MSE backpropagation value is not as expected'
 
 
 def test_sample_seqs():
     
     #make toy sequences and labels
     #assumes that sequences are all the same size 
-    toy_seq1=['ATCG', 'ACTG', 'TTTT', 'ATAT', 'GTGT', 'ACTG', 'CTGA']
-    toy_seq2=['ATCG', 'ATCG', 'tatg', 'GGGC']
+    toy_seqs=['ATCG', 'ACTG', 'TTTT', 'ATAT', 'GTGT', 'ACTG', 'CTGA']
+    toy_labels=['A', 'A', 'A', 'A', 'A', 'B', 'B']
+
+    #resample
+    sampled_seqs, sampled_labels=sample_seqs(toy_seqs, toy_labels)
+
+    assert len(sampled_seqs)==10, 'length of total sampled seqs is incorrect'
+    assert sampled_labels.count('A') ==sampled_labels.count('B'), 'different number of sampled sequences for labels '
 
 
-
-
-    assert 1==2
 
 def test_one_hot_encode_seqs():
 
