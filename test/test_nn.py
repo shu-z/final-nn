@@ -15,14 +15,7 @@ import matplotlib.pyplot as plt
 #make a toy instance of nn class to be used for testing 
 example_nn = NeuralNetwork(nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                                       {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}],
-                            lr = 0.0005, seed = 3, batch_size = 10, epochs = 1, loss_function='mse', verbose=False)
-
-
-#use digits as a test dataset
-digits = load_digits()
-  
-#split into train and test sets 
-X_train, X_test, y_train, y_test=train_test_split(digits.data, digits.target, train_size=0.8, random_state=3)
+                            lr = 0.0005, seed = 3, batch_size = 11, epochs = 1, loss_function='mse', verbose=False)
 
 
 
@@ -46,14 +39,52 @@ def test_single_forward():
     assert A_curr.shape==(3,2), 'shape of A_curr is incorrect'
     assert Z_curr.shape==(3,2), 'shape of Z_curr is incorrect'
 
+    #test nonexistent activation 
+    with pytest.raises(Exception):
+       example_nn._single_forward(W_curr, b_curr, A_prev, activation='idk'), 'forward is not raising error for nonexistent activation function!'
+ 
+
  
     
 
 def test_forward():
 
+    #make simple nn
+    nn_arch_simple= [{'input_dim': 3, 'output_dim': 2, 'activation': 'relu'},
+                                      {'input_dim': 2, 'output_dim': 3, 'activation': 'relu'}]
+    simple_nn = NeuralNetwork(nn_arch = nn_arch_simple, lr = 0.0005, seed = 3, 
+                               batch_size = 10, epochs = 1, loss_function='mse', verbose=False)
 
-    #check that 
-    pass
+
+    #init some params 
+    param_dict = {}
+    #set seed so values are the same 
+    np.random.seed(4)
+    for idx, layer in enumerate(nn_arch_simple):
+        layer_idx = idx + 1
+        input_dim = layer['input_dim']
+        output_dim = layer['output_dim']
+        param_dict['W' + str(layer_idx)] = np.random.randn(output_dim, input_dim) * 0.1
+        param_dict['b' + str(layer_idx)] = np.random.randn(output_dim, 1) * 0.1
+    simple_nn._param_dict=param_dict
+
+
+    #make toy X and run forward
+    X=np.array([[1,2,5], [1,1,1]])
+    y_pred, cache = simple_nn.forward(X)
+   
+    #check that one forward pass values are as expected 
+    assert np.allclose(y_pred,np.array([[0, 0.035099, 0], [0, 0.035099, 0]]), rtol=1e-4)
+    assert y_pred.shape==X.shape
+
+    #check that cache values and shapes were set appropriately
+    assert np.allclose(cache['A0'], X)
+    assert np.allclose(cache['A1'],np.array([[0, 0], [0, 0]]))
+    assert cache['Z1'].shape==(2,2)
+
+
+
+
 
 def test_single_backprop():
 
@@ -73,38 +104,66 @@ def test_single_backprop():
     assert np.allclose(dA_prev, np.array([[1,1]]))
     assert np.allclose(dW_curr, np.array([[1]]))
     assert np.allclose(db_curr, np.array([[1]]))
+
+    #test nonexistent activation 
+    with pytest.raises(Exception):
+       example_nn._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, 'idk'), 'backprop is not raising error for nonexistent activation function!'
  
 
 
 
 def test_predict():
 
-    #test that prediction is correct 
+    #similar to test_forward above 
+
+    #make simple nn 
+    nn_arch_simple= [{'input_dim': 3, 'output_dim': 2, 'activation': 'relu'},
+                                      {'input_dim': 2, 'output_dim': 3, 'activation': 'relu'}]
+    simple_nn = NeuralNetwork(nn_arch = nn_arch_simple, lr = 0.0005, seed = 3, 
+                               batch_size = 10, epochs = 1, loss_function='mse', verbose=False)
 
 
-    #use TF data to access accuracy 
+    #init some params 
+    param_dict = {}
+    #set seed so values are the same 
+    np.random.seed(4)
+    for idx, layer in enumerate(nn_arch_simple):
+        layer_idx = idx + 1
+        input_dim = layer['input_dim']
+        output_dim = layer['output_dim']
+        param_dict['W' + str(layer_idx)] = np.random.randn(output_dim, input_dim) * 0.1
+        param_dict['b' + str(layer_idx)] = np.random.randn(output_dim, 1) * 0.1
+    simple_nn._param_dict=param_dict
+    simple_nn._param_dict_init=param_dict
 
 
-    # #make logreg class 
-	# log_model = LogisticRegressor(num_feats = len(w) - 1, learning_rate=0.01, max_iter=5000, batch_size=50)
-
-	# #train logreg model 
-	# log_model.train_model(X_train, y_train, X_val, y_val)
-	
-	# #make predictions on new test set 
-	# model_pred = log_model.make_prediction(X_test)
-	# model_pred_binary = np.where(model_pred > 0.5, 1, 0)
-	# y_test_binary=np.where(y_test > 0.5, 1, 0)
-
-	# #get accuracy of prediction on separate test set 
-	# accuracy=np.sum(model_pred_binary == y_test_binary)/len(y_test_binary)
-
-	# #check accuracy is at least a little better than chance lol
-	# assert accuracy>0.6, "accuracy is worse than 0.6!"
-        
+    #make toy X 
+    X=np.array([[1,2,5], [1,1,1]])
 
 
-    pass
+    #check that warning is thrown if fit isn't run before predict
+    #suggested if params aren't updated 
+    with pytest.raises(Warning):
+        simple_nn.predict(X)
+    
+    #now just set init params to empty dict
+    simple_nn._param_dict_init={}
+
+    #check that predicted values are as expected 
+    y_pred = simple_nn.predict(X)
+
+    assert np.allclose(y_pred,np.array([[0, 0.035099, 0], [0, 0.035099, 0]]), rtol=1e-4)
+    assert y_pred.shape==X.shape
+
+   
+
+
+    
+
+
+    
+
+ 
 
 def test_binary_cross_entropy():
         

@@ -54,6 +54,7 @@ class NeuralNetwork:
 
         # Initialize the parameter dictionary for use in training
         self._param_dict = self._init_params()
+        self._param_dict_init=self._param_dict
 
     def _init_params(self) -> Dict[str, ArrayLike]:
         """
@@ -487,6 +488,10 @@ class NeuralNetwork:
             y_hat: ArrayLike
                 Prediction from the model.
         """
+
+        if self._param_dict_init==self._param_dict:
+            raise Warning('Param dict is same as initial param dict. Make sure fit was run')
+        
         y_hat,_ =self.forward(X)
         return y_hat
     
