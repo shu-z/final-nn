@@ -1,3 +1,5 @@
+![BuildStatus](https://github.com/shu-z/final-nn/actions/workflows/main.yml/badge.svg)
+
 # Final project: neural network
 
 ## Overview
