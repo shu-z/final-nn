@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 #make an instance of nn class to be used by multiple functions
 example_nn = NeuralNetwork(nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                                       {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}],
-                            lr = 0.0005, seed = 3, batch_size = 100, epochs = 100, loss_function='mse', verbose=False)
+                            lr = 0.0005, seed = 3, batch_size = 100, epochs = 100, 
+                            loss_function='mse', verbose=False)
 
 
 #use digits as a test dataset
@@ -28,19 +29,23 @@ X_train, X_test, y_train, y_test=train_test_split(digits.data, digits.target, tr
 
 def test_single_forward():
 
-    #check that A_curr and Z_cur values are expected as to when calculated by hand
-    W_curr=np.array([[1,1,1], [1,2,3]])
-    b_curr=np.array([[0,0]])
-    A_prev=np.array([1,2,3])
-    A_curr, Z_curr=example_nn._single_forward(W_curr, b_curr, A_prev, activation='relu')
-    print(A_curr, Z_curr)
-
-
-    assert np.isclose(A_curr, np.array([]))
-    #assert np.isclose(Z_curr, [])
+    #make some toy values
+    W_curr=np.array([[1,1,1], [1,2,-2]])
+    b_curr=np.array([[1,0,0]])
+    A_prev=np.array([1,-2,1])
     
+    #run single forward 
+    A_curr, Z_curr=example_nn._single_forward(W_curr, b_curr, A_prev, activation='relu')
+    print(A_curr)
 
-    #check dimensions of A_curr and Z_curr
+
+   #check values to hand calculated 
+    assert np.allclose(Z_curr, np.array([[1,-4], [0,-5], [0,-5]]))
+    assert np.allclose(A_curr, np.array([[1,0], [0,0], [0,0]]))
+ 
+    #check shape of matrices 
+    assert A_curr.shape==(3,2), 'shape of A_curr is incorrect'
+    assert Z_curr.shape==(3,2), 'shape of Z_curr is incorrect'
 
  
     
@@ -52,7 +57,27 @@ def test_forward():
     pass
 
 def test_single_backprop():
-    pass
+    #make some toy values
+    W_curr=np.array([[1,1,1], [1,2,-2]])
+    b_curr=np.array([[1,0,0]])
+    A_prev=np.array([1,-2,1])
+
+    Z_curr=[]
+    A_curr=[]
+    dA_curr=[]
+    
+    #run single backprop
+    dA_prev, dW_curr, db_curr=example_nn._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, 'relu')
+    print(A_curr)
+
+
+   #check values to hand calculated 
+    assert np.allclose(Z_curr, np.array([[1,-4], [0,-5], [0,-5]]))
+    assert np.allclose(A_curr, np.array([[1,0], [0,0], [0,0]]))
+ 
+    #check shape of matrices 
+    assert A_curr.shape==(3,2), 'shape of A_curr is incorrect'
+    assert Z_curr.shape==(3,2), 'shape of Z_curr is incorrect'
 
 def test_predict():
 
