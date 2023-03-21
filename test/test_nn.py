@@ -3,12 +3,8 @@ import pytest
 import numpy as np
 from sklearn.metrics import log_loss, mean_squared_error
 
-
 from nn.nn import NeuralNetwork
 from nn.preprocess import sample_seqs, one_hot_encode_seqs
-from sklearn.datasets import load_digits
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 
 
 
@@ -134,15 +130,14 @@ def test_predict():
         param_dict['W' + str(layer_idx)] = np.random.randn(output_dim, input_dim) * 0.1
         param_dict['b' + str(layer_idx)] = np.random.randn(output_dim, 1) * 0.1
     simple_nn._param_dict=param_dict
+    #set initial param dict, which throws error if predict is run and params don't change
     simple_nn._param_dict_init=param_dict
 
 
     #make toy X 
     X=np.array([[1,2,5], [1,1,1]])
 
-
     #check that warning is thrown if fit isn't run before predict
-    #suggested if params aren't updated 
     with pytest.raises(Warning):
         simple_nn.predict(X)
     
@@ -154,12 +149,6 @@ def test_predict():
 
     assert np.allclose(y_pred,np.array([[0, 0.035099, 0], [0, 0.035099, 0]]), rtol=1e-4)
     assert y_pred.shape==X.shape
-
-   
-
-
-    
-
 
     
 
@@ -181,6 +170,7 @@ def test_binary_cross_entropy():
     assert np.isclose(nn_loss, sklearn_loss, rtol=1e-4), 'BCE is not as expected'
  
 
+
 def test_binary_cross_entropy_backprop():
 
     #do vs hand calculated 
@@ -194,6 +184,7 @@ def test_binary_cross_entropy_backprop():
     assert np.allclose(nn_backprop, [0.41665, -2/3, -1/3], rtol=1e-4), 'BCE backpropagation value is not as expected'
 
 
+
 def test_mean_squared_error():
 
     #make random y_true and y_pred
@@ -202,7 +193,6 @@ def test_mean_squared_error():
 
 
     #compare to hand calculated 
-    #nn_mse=example_nn._mean_squared_error(np.expand_dims(y_true, 1), np.expand_dims(y_pred,1))
     nn_mse=example_nn._mean_squared_error(np.array(y_true), np.array(y_pred))
     sklearn_mse=mean_squared_error(y_true, y_pred)
 
@@ -218,11 +208,10 @@ def test_mean_squared_error_backprop():
 
 
     #compare to hand calculated 
-    #nn_mse=example_nn._mean_squared_error(np.expand_dims(y_true, 1), np.expand_dims(y_pred,1))
     nn_mse=example_nn._mean_squared_error_backprop(np.array(y_true), np.array(y_pred))
     print(nn_mse)
 
-	#check that mse  from our function is close to sklearn mse with reasonable tolerance 
+	#check that mse from our function is close to sklearn mse with reasonable tolerance 
     assert np.allclose(nn_mse, [2/3, 2/3, -2/3], rtol=1e-4), 'MSE backpropagation value is not as expected'
 
 
