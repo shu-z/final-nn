@@ -225,7 +225,7 @@ class NeuralNetwork:
             raise Exception('no suitable activation function chosen!! check ur spelling')
             
         #check this   
-        m=A_prev.shape[1]
+      
         #dW_curr=np.dot(dZ.T, A_prev) / m 
         #db_curr=np.sum(dZ, axis=0) / m 
         dW_curr=np.dot(dZ.T, A_prev)  
@@ -603,12 +603,12 @@ class NeuralNetwork:
 
 
         #first get bce 
-        bce=self._binary_cross_entropy(y, y_hat)
+        #bce=self._binary_cross_entropy(y, y_hat)
         
         #i had to google this i'm sorry
         #add error for divide by zero 
         #need to double check this i think it's wrong 
-        dA=-np.mean((y/y_hat + error) + (1-y)/(1-y_hat+error))
+        dA=(-(y/y_hat + error) + (1-y)/(1-y_hat+error))/len(y)
         #dA=np.mean((y/y_hat + error) + (1-y)/(1-y_hat+error))
 
         

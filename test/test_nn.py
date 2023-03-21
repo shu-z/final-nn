@@ -12,11 +12,10 @@ import matplotlib.pyplot as plt
 
 
 
-#make an instance of nn class to be used by multiple functions
+#make a toy instance of nn class to be used for testing 
 example_nn = NeuralNetwork(nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
                                       {'input_dim': 16, 'output_dim': 64, 'activation': 'relu'}],
-                            lr = 0.0005, seed = 3, batch_size = 100, epochs = 100, 
-                            loss_function='mse', verbose=False)
+                            lr = 0.0005, seed = 3, batch_size = 10, epochs = 1, loss_function='mse', verbose=False)
 
 
 #use digits as a test dataset
@@ -57,27 +56,26 @@ def test_forward():
     pass
 
 def test_single_backprop():
-    #make some toy values
-    W_curr=np.array([[1,1,1], [1,2,-2]])
-    b_curr=np.array([[1,0,0]])
-    A_prev=np.array([1,-2,1])
 
-    Z_curr=[]
-    A_curr=[]
-    dA_curr=[]
+    #make some toy values
+    W_curr=np.array([[1,1], [1,2]])
+    b_curr=np.array([[1]])
+    A_prev=np.array([1,-2])
+
+    Z_curr=np.array([2,-2])
+    A_curr=np.array([2,-2])
+    dA_curr=np.array([1,-1])
     
     #run single backprop
     dA_prev, dW_curr, db_curr=example_nn._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, 'relu')
-    print(A_curr)
 
-
-   #check values to hand calculated 
-    assert np.allclose(Z_curr, np.array([[1,-4], [0,-5], [0,-5]]))
-    assert np.allclose(A_curr, np.array([[1,0], [0,0], [0,0]]))
+  #check values to hand calculated 
+    assert np.allclose(dA_prev, np.array([[1,1]]))
+    assert np.allclose(dW_curr, np.array([[1]]))
+    assert np.allclose(db_curr, np.array([[1]]))
  
-    #check shape of matrices 
-    assert A_curr.shape==(3,2), 'shape of A_curr is incorrect'
-    assert Z_curr.shape==(3,2), 'shape of Z_curr is incorrect'
+
+
 
 def test_predict():
 
@@ -129,13 +127,12 @@ def test_binary_cross_entropy_backprop():
     #do vs hand calculated 
 
     y_true=[0, 1, 1]
-    y_pred=[0.2, 0.9, 1]
+    y_pred=[0.2, 0.5, 1]
         
 
     #test with nn model
     nn_backprop=example_nn._binary_cross_entropy_backprop(np.array(y_true), np.array(y_pred))
-    print(nn_backprop)
-    assert np.isclose(nn_backprop, -1.120375, rtol=1e-4), 'BCE backpropagation value is not as expected'
+    assert np.allclose(nn_backprop, [0.41665, -2/3, -1/3], rtol=1e-4), 'BCE backpropagation value is not as expected'
 
 
 def test_mean_squared_error():
@@ -167,7 +164,7 @@ def test_mean_squared_error_backprop():
     print(nn_mse)
 
 	#check that mse  from our function is close to sklearn mse with reasonable tolerance 
-    assert np.isclose(nn_mse, 2/3, rtol=1e-4), 'MSE backpropagation value is not as expected'
+    assert np.allclose(nn_mse, [2/3, 2/3, -2/3], rtol=1e-4), 'MSE backpropagation value is not as expected'
 
 
 def test_sample_seqs():
